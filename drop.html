@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>典藏實錄 Archives | LC MAISON</title>
-    <meta name="description" content="瀏覽 LC MAISON 的典藏實錄。見證每一部超跑與豪華座駕在龍策職人的雕琢下，如何重現光影美學的巔峰。">
-    <meta property="og:title" content="典藏實錄 | LC MAISON">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200">
+    <title>典藏實錄 | 龍策 DETAILING</title>
+    <meta name="description" content="瀏覽龍策 DETAILING 的典藏施工實錄，見證每部愛車在職人雙手下重現光影巔峰的過程。">
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
-        .archive-header { margin-bottom: 100px; }
+        .archive-header { margin-bottom: 80px; }
         .archive-masonry {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -24,6 +22,7 @@
             overflow: hidden;
             filter: grayscale(1) brightness(0.7);
             transition: 1s var(--ease-silk);
+            cursor: pointer;
         }
         .archive-box:hover { filter: grayscale(0) brightness(1); }
         .archive-info {
@@ -32,45 +31,61 @@
             left: 30px;
             opacity: 0;
             transition: 0.6s var(--ease-silk);
+            transform: translateY(10px);
         }
-        .archive-box:hover .archive-info { opacity: 1; transform: translateY(-10px); }
-        .archive-info span { font-size: 0.6rem; letter-spacing: 0.2rem; text-transform: uppercase; color: #fff; border: 1px solid #fff; padding: 4px 10px; }
+        .archive-box:hover .archive-info { opacity: 1; transform: translateY(0); }
+        .archive-info span {
+            font-size: 0.6rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 5px 12px;
+            background: rgba(0,0,0,0.3);
+        }
+        .archive-empty {
+            grid-column: 1 / -1;
+            padding: 100px 0;
+            text-align: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.8rem;
+            letter-spacing: 0.3rem;
+        }
+        .archive-loading {
+            grid-column: 1 / -1;
+            padding: 80px 0;
+            text-align: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            letter-spacing: 0.3rem;
+        }
         @media (max-width: 1024px) { .archive-masonry { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .archive-masonry { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .archive-masonry { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .archive-info { bottom: 15px; left: 15px; }
+        }
+        @media (max-width: 480px) { .archive-masonry { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-
     <nav>
-        <a href="index.html" class="brand">LC MAISON</a>
+        <a href="index.html" class="brand">龍策 DETAILING</a>
         <button id="menuTrigger" class="nav-hamburger" aria-label="選單">
             <span></span><span></span><span></span>
         </button>
         <div class="nav-links">
             <a href="index.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">The Maison</span>
-                    <span class="zh">品牌首頁</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Home</span><span class="zh">品牌首頁</span></span>
             </a>
             <a href="glow.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Collections</span>
-                    <span class="zh">工藝選集</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Collections</span><span class="zh">工藝選集</span></span>
             </a>
             <a href="drop.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Archives</span>
-                    <span class="zh">典藏實錄</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Archives</span><span class="zh">典藏實錄</span></span>
             </a>
             <a href="booking.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Appointments</span>
-                    <span class="zh">私人預約</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Booking</span><span class="zh">立即預約</span></span>
             </a>
         </div>
     </nav>
@@ -78,32 +93,69 @@
     <main>
         <section>
             <div class="archive-header reveal-maison">
-                <span class="bilingual-text" style="font-size: 0.8rem; letter-spacing: 0.8rem; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 30px;">
-                    <span class="bilingual-inner">
-                        <span class="en">The Archives</span>
-                        <span class="zh">品牌典藏實錄</span>
-                    </span>
-                </span>
-                <h1 class="maison-title">典藏實錄</h1>
+                <span style="font-size:0.65rem;letter-spacing:0.5rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:25px;">典藏實錄 / THE ARCHIVES</span>
+                <h1 class="maison-title">施工典藏</h1>
+                <p class="maison-body" style="max-width:500px;margin-top:15px;">每一張照片，都是龍策職人對完美的見證。</p>
             </div>
 
-            <div class="archive-masonry">
-                <div class="archive-box reveal-maison" style="background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200')">
-                    <div class="archive-info"><span>Project / Armor</span></div>
-                </div>
-                <div class="archive-box reveal-maison" style="background-image: url('https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1200')">
-                    <div class="archive-info"><span>Project / Shield</span></div>
-                </div>
-                <div class="archive-box reveal-maison" style="background-image: url('https://images.unsplash.com/photo-1567818735868-e71b99932e29?q=80&w=1200')">
-                    <div class="archive-info"><span>Project / Gloss</span></div>
-                </div>
-                <div class="archive-box reveal-maison" style="background-image: url('https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80&w=1200')">
-                    <div class="archive-info"><span>Project / Shield</span></div>
-                </div>
+            <div class="archive-masonry" id="archive-grid">
+                <div class="archive-loading">載入中...</div>
             </div>
         </section>
     </main>
 
+    <script>
+        const SUPABASE_URL = 'https://dgepltmxtbwbfalqgnqv.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZXBsdG14dGJ3YmZhbHFnbnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDU2NzIsImV4cCI6MjA5NjA4MTY3Mn0.pqGMLBJGBc4apgLIZCnIVGiVaq4XN6Zqws15wC1sZQ4';
+        const BUCKET = 'images';
+        const PREFIX = 'archives/';
+
+        async function loadArchives() {
+            const grid = document.getElementById('archive-grid');
+            try {
+                const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ limit: 100, offset: 0, prefix: PREFIX, sortBy: { column: 'created_at', order: 'desc' } })
+                });
+                const files = await res.json();
+
+                if (!res.ok || !Array.isArray(files) || files.length === 0) {
+                    grid.innerHTML = '<div class="archive-empty">典藏照片即將上線</div>';
+                    return;
+                }
+
+                const items = files.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+                if (items.length === 0) {
+                    grid.innerHTML = '<div class="archive-empty">典藏照片即將上線</div>';
+                    return;
+                }
+
+                grid.innerHTML = items.map((f, i) => {
+                    const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${PREFIX}${f.name}`;
+                    return `
+                        <div class="archive-box reveal-maison" style="background-image:url('${url}')">
+                            <div class="archive-info"><span>Project / ${String(i + 1).padStart(2, '0')}</span></div>
+                        </div>`;
+                }).join('');
+
+                // Trigger reveal animations
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+                }, { threshold: 0.1 });
+                document.querySelectorAll('.archive-box').forEach(el => observer.observe(el));
+
+            } catch(e) {
+                grid.innerHTML = '<div class="archive-empty">典藏照片即將上線</div>';
+            }
+        }
+
+        loadArchives();
+    </script>
     <script src="assets/js/main.js"></script>
 </body>
 </html>

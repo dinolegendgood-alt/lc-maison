@@ -3,122 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工藝選集 Collections | LC MAISON</title>
-    <meta name="description" content="探索 LC MAISON 的年度工藝選集。從城市焦點精洗到旗艦漆面防護，我們為您的愛車提供最高等級的視覺與物理防護。">
-    <meta property="og:title" content="工藝選集 | LC MAISON">
-    <meta property="og:description" content="探索年度工藝選集，啟動閣下的美學任務。">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1200">
+    <title>工藝選集 | 龍策 DETAILING</title>
+    <meta name="description" content="探索龍策 DETAILING 的三大工藝等級。從城市精洗、結晶鍍膜到旗艦漆面防護，為您的愛車選擇最完整的守護方案。">
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
-        .collection-list { margin-top: 100px; }
-        .collection-item {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 100px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            text-decoration: none;
-            color: var(--text);
-            transition: 0.6s var(--ease-silk);
+        .collections-hero { min-height: 45vh; padding-top: 160px; padding-bottom: 60px; }
+        .collections-hero h1 { font-family: var(--font-serif); font-size: 5vw; font-weight: 400; line-height: 1.1; margin-bottom: 20px; }
+        .collections-subtitle { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.25rem; max-width: 500px; line-height: 1.7; }
+
+        .services-wrapper { padding: 0 var(--p-side) 120px; }
+
+        .service-item {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 80px 0;
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 80px;
+            align-items: start;
         }
-        .collection-item:hover { padding-left: 30px; border-bottom-color: #fff; }
-        .collection-name { font-family: var(--font-serif); font-size: 4rem; font-weight: 400; }
-        .collection-meta { font-size: 0.8rem; letter-spacing: 0.3rem; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; display: block; }
+        .service-item:last-child { border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        .service-num {
+            font-family: var(--font-serif);
+            font-size: 7rem;
+            font-weight: 900;
+            line-height: 1;
+            color: rgba(255,255,255,0.05);
+            letter-spacing: -0.02em;
+            user-select: none;
+        }
+
+        .service-tag {
+            display: block;
+            font-size: 0.62rem;
+            letter-spacing: 0.45rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .service-name {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+        .service-name-en {
+            font-size: 0.75rem;
+            letter-spacing: 0.35rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            display: block;
+        }
+        .service-desc {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.85;
+            max-width: 580px;
+            margin-bottom: 40px;
+        }
+
+        .service-includes {
+            list-style: none;
+            margin-bottom: 45px;
+            max-width: 520px;
+        }
+        .service-includes li {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 0.05rem;
+        }
+        .service-includes li::before {
+            content: '';
+            width: 18px;
+            height: 1px;
+            background: rgba(255,255,255,0.25);
+            flex-shrink: 0;
+        }
+        .service-includes li.highlight {
+            color: rgba(255,255,255,0.95);
+            font-weight: 400;
+        }
+        .service-includes li.highlight::before { background: rgba(255,255,255,0.6); }
+
+        .service-footer {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .service-price-label {
+            font-size: 0.62rem;
+            letter-spacing: 0.3rem;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+        .service-price-val {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+        }
+        .service-btn {
+            display: inline-block;
+            padding: 16px 40px;
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 0.35rem;
+            text-transform: uppercase;
+            transition: 0.4s var(--ease-silk);
+        }
+        .service-btn:hover { background: #fff; color: #000; border-color: #fff; }
+
+        /* Guarantee strip */
+        .guarantee-strip {
+            background: rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 50px var(--p-side);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 0;
+        }
+        .guarantee-item { text-align: center; }
+        .guarantee-num { font-family: var(--font-serif); font-size: 2.5rem; font-weight: 400; margin-bottom: 8px; }
+        .guarantee-label { font-size: 0.65rem; letter-spacing: 0.25rem; color: var(--muted); text-transform: uppercase; }
+
+        @media (max-width: 1024px) {
+            .service-item { grid-template-columns: 120px 1fr; gap: 50px; }
+            .service-num { font-size: 5rem; }
+        }
         @media (max-width: 768px) {
-            .collection-name { font-size: 2rem; }
-            .collection-item { flex-direction: column; align-items: flex-start; padding: 60px 0; }
+            .collections-hero { min-height: auto; }
+            .collections-hero h1 { font-size: 2.5rem; }
+            .services-wrapper { padding: 0 var(--p-side) 80px; }
+            .service-item { grid-template-columns: 1fr; gap: 0; padding: 50px 0; }
+            .service-num { font-size: 4rem; margin-bottom: 20px; }
+            .service-name { font-size: 2rem; }
+            .service-footer { flex-direction: column; gap: 20px; }
+            .service-btn { width: 100%; text-align: center; }
+            .guarantee-strip { padding: 40px var(--p-side); }
+            .guarantee-num { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-
     <nav>
-        <a href="index.html" class="brand">LC MAISON</a>
+        <a href="index.html" class="brand">龍策 DETAILING</a>
         <button id="menuTrigger" class="nav-hamburger" aria-label="選單">
             <span></span><span></span><span></span>
         </button>
         <div class="nav-links">
             <a href="index.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">The Maison</span>
-                    <span class="zh">品牌首頁</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Home</span><span class="zh">品牌首頁</span></span>
             </a>
             <a href="glow.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Collections</span>
-                    <span class="zh">工藝選集</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Collections</span><span class="zh">工藝選集</span></span>
             </a>
             <a href="drop.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Archives</span>
-                    <span class="zh">典藏實錄</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Archives</span><span class="zh">典藏實錄</span></span>
             </a>
             <a href="booking.html" class="bilingual-link">
-                <span class="bilingual-inner">
-                    <span class="en">Appointments</span>
-                    <span class="zh">私人預約</span>
-                </span>
+                <span class="bilingual-inner"><span class="en">Booking</span><span class="zh">立即預約</span></span>
             </a>
         </div>
     </nav>
 
     <main>
-        <section>
-            <div class="reveal-maison">
-                <span class="bilingual-text" style="font-size: 0.8rem; letter-spacing: 0.8rem; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 30px;">
-                    <span class="bilingual-inner">
-                        <span class="en">The Collections</span>
-                        <span class="zh">年度工藝選集</span>
-                    </span>
-                </span>
-                <h1 class="maison-title" style="font-size: 6vw;">工藝選集</h1>
-            </div>
-
-            <div class="collection-list">
-                <a href="booking.html" class="collection-item reveal-maison">
-                    <div>
-                        <span class="collection-meta">Collection 01 / Gloss</span>
-                        <h2 class="collection-name">城市焦點精洗</h2>
-                    </div>
-                    <span class="collection-meta bilingual-text">
-                        <span class="bilingual-inner">
-                            <span class="en">Explore Details —</span>
-                            <span class="zh">探索工藝細節</span>
-                        </span>
-                    </span>
-                </a>
-
-                <a href="booking.html" class="collection-item reveal-maison">
-                    <div>
-                        <span class="collection-meta">Collection 02 / Shield</span>
-                        <h2 class="collection-name">結晶美學鍍膜</h2>
-                    </div>
-                    <span class="collection-meta bilingual-text">
-                        <span class="bilingual-inner">
-                            <span class="en">Explore Details —</span>
-                            <span class="zh">探索工藝細節</span>
-                        </span>
-                    </span>
-                </a>
-
-                <a href="booking.html" class="collection-item reveal-maison">
-                    <div>
-                        <span class="collection-meta">Collection 03 / Armor</span>
-                        <h2 class="collection-name">旗艦漆面防護</h2>
-                    </div>
-                    <span class="collection-meta bilingual-text">
-                        <span class="bilingual-inner">
-                            <span class="en">Explore Details —</span>
-                            <span class="zh">探索工藝細節</span>
-                        </span>
-                    </span>
-                </a>
-            </div>
+        <section class="collections-hero reveal-maison">
+            <span style="font-size:0.65rem;letter-spacing:0.5rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:25px;">工藝選集 / THE COLLECTIONS</span>
+            <h1>為愛車選擇<br>最合適的守護</h1>
+            <p class="collections-subtitle" style="margin-top:20px;">三種等級的專業工藝方案，從日常養護到頂級防護，每一項都是龍策對品質的完整承諾。</p>
         </section>
+
+        <div class="services-wrapper">
+
+            <!-- Collection 01 -->
+            <div class="service-item reveal-maison">
+                <div class="service-num">01</div>
+                <div>
+                    <span class="service-tag">Collection 01 / Gloss</span>
+                    <h2 class="service-name">城市焦點精洗</h2>
+                    <span class="service-name-en">Urban Gloss Detail</span>
+                    <p class="service-desc">
+                        專為重視日常養護的車主設計。透過完整的外觀深層清潔與輕度漆面修復，在城市生活中持續維持愛車最佳的光澤狀態，是每季定期保養的首選方案。
+                    </p>
+                    <ul class="service-includes">
+                        <li>全車外觀精洗 + 輪圈輪胎深度清潔</li>
+                        <li>黏土棒去除漆面污染物（鐵粉、柏油）</li>
+                        <li>輕微旋渦紋路研磨修復</li>
+                        <li>手工高品質封蠟保護</li>
+                        <li>玻璃潑水鍍膜處理</li>
+                        <li>車內除塵、儀表板護理</li>
+                    </ul>
+                    <div class="service-footer">
+                        <div>
+                            <div class="service-price-label">參考報價</div>
+                            <div class="service-price-val">歡迎洽詢</div>
+                        </div>
+                        <a href="booking.html" class="service-btn">預約此項服務</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection 02 -->
+            <div class="service-item reveal-maison">
+                <div class="service-num">02</div>
+                <div>
+                    <span class="service-tag">Collection 02 / Shield</span>
+                    <h2 class="service-name">結晶美學鍍膜</h2>
+                    <span class="service-name-en">Ceramic Coating</span>
+                    <p class="service-desc">
+                        以日本進口陶瓷鍍膜技術，在漆面建立奈米級硬度防護層。色澤更飽和、光感更深邃，同時長效抵禦日曬、酸雨、細砂與化學污染物的侵蝕。
+                    </p>
+                    <ul class="service-includes">
+                        <li class="highlight">包含 Collection 01 全部項目</li>
+                        <li>漆面深度研磨校正（去除細紋、旋渦紋）</li>
+                        <li>日本進口 9H 陶瓷鍍膜施作</li>
+                        <li>鍍膜表面硬度強化處理</li>
+                        <li>輪圈鍍膜保護</li>
+                        <li class="highlight">鍍膜保固：12 個月</li>
+                    </ul>
+                    <div class="service-footer">
+                        <div>
+                            <div class="service-price-label">參考報價</div>
+                            <div class="service-price-val">歡迎洽詢</div>
+                        </div>
+                        <a href="booking.html" class="service-btn">預約此項服務</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collection 03 -->
+            <div class="service-item reveal-maison">
+                <div class="service-num">03</div>
+                <div>
+                    <span class="service-tag">Collection 03 / Armor</span>
+                    <h2 class="service-name">旗艦漆面防護</h2>
+                    <span class="service-name-en">Flagship Paint Protection</span>
+                    <p class="service-desc">
+                        龍策最高規格的全方位防護系統。結合 TPU 漆面保護膜（PPF）與頂級鍍膜雙重工法，為超跑、豪華座駕提供業界最完整的長期物理與化學防護。
+                    </p>
+                    <ul class="service-includes">
+                        <li class="highlight">包含 Collection 01 + 02 全部項目</li>
+                        <li>全車 TPU 漆面保護膜（PPF）貼附</li>
+                        <li>門邊、引擎蓋重點加強防護</li>
+                        <li>頂級旗艦陶瓷鍍膜封層</li>
+                        <li>施工後全車精密品質檢測</li>
+                        <li class="highlight">鍍膜保固：36 個月</li>
+                    </ul>
+                    <div class="service-footer">
+                        <div>
+                            <div class="service-price-label">參考報價</div>
+                            <div class="service-price-val">歡迎洽詢</div>
+                        </div>
+                        <a href="booking.html" class="service-btn">預約此項服務</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 數字保證 -->
+        <div class="guarantee-strip reveal-maison">
+            <div class="guarantee-item">
+                <div class="guarantee-num">12+</div>
+                <div class="guarantee-label">品牌深耕年數</div>
+            </div>
+            <div class="guarantee-item">
+                <div class="guarantee-num">500+</div>
+                <div class="guarantee-label">服務完工案例</div>
+            </div>
+            <div class="guarantee-item">
+                <div class="guarantee-num">9H</div>
+                <div class="guarantee-label">頂級鍍膜硬度</div>
+            </div>
+            <div class="guarantee-item">
+                <div class="guarantee-num">36M</div>
+                <div class="guarantee-label">最長保固月數</div>
+            </div>
+        </div>
+
     </main>
 
     <script src="assets/js/main.js"></script>

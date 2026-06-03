@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理後台 | LC MAISON</title>
+    <title>管理後台 | 龍策 DETAILING</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
@@ -96,6 +96,7 @@
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('appointments',this)">預約管理</button>
+        <button class="tab-btn" onclick="switchTab('archives',this)">典藏照片</button>
         <button class="tab-btn" onclick="switchTab('images',this)">圖片庫</button>
     </div>
 
@@ -124,6 +125,22 @@
                     <tr><td colspan="7" class="placeholder">載入中...</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- 典藏照片 -->
+    <div id="tab-archives" class="tab-content">
+        <div id="arc-msg"></div>
+        <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:25px;line-height:1.7;">
+            上傳的照片會直接顯示在網站「典藏實錄」頁面。建議使用橫式或直式均可，系統會自動排列。
+        </p>
+        <div class="upload-zone" onclick="document.getElementById('arcInput').click()">
+            <p>點擊上傳典藏照片</p>
+            <p style="margin-top:12px;font-size:0.65rem;">支援 JPG、PNG、WebP，可多選</p>
+            <input type="file" id="arcInput" accept="image/*" multiple onchange="uploadArchives(this.files)">
+        </div>
+        <div class="img-grid" id="arc-grid">
+            <div class="placeholder" style="grid-column:1/-1">載入中...</div>
         </div>
     </div>
 
@@ -173,6 +190,7 @@ function switchTab(name, btn) {
     document.getElementById('tab-' + name).classList.add('active');
     btn.classList.add('active');
     if (name === 'images') loadImages();
+    if (name === 'archives') loadArchives();
 }
 
 // --- Appointments ---
@@ -291,6 +309,67 @@ async function delImg(name) {
 
 function copyUrl(url) {
     navigator.clipboard.writeText(url).then(() => alert('圖片網址已複製！'));
+}
+
+// --- Archives ---
+const ARC_PREFIX = 'archives/';
+
+async function loadArchives() {
+    const grid = document.getElementById('arc-grid');
+    grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">載入中...</div>';
+    try {
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+            method: 'POST', headers: h,
+            body: JSON.stringify({ limit: 200, offset: 0, prefix: ARC_PREFIX, sortBy: { column: 'created_at', order: 'desc' } })
+        });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) {
+            grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">請確認 Storage Bucket「images」已建立</div>';
+            return;
+        }
+        const files = data.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+        if (!files.length) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">尚無典藏照片，請上傳</div>'; return; }
+
+        grid.innerHTML = files.map(f => {
+            const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${ARC_PREFIX}${f.name}`;
+            return `
+                <div class="img-card">
+                    <img src="${url}" loading="lazy">
+                    <div class="img-overlay">
+                        <p class="img-name">${f.name}</p>
+                        <button class="del-img-btn" onclick="delArchive('${f.name}')">從典藏刪除</button>
+                    </div>
+                </div>`;
+        }).join('');
+    } catch(e) {
+        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">錯誤：${e.message}</div>`;
+    }
+}
+
+async function uploadArchives(files) {
+    showMsg('arc-msg', `上傳中（0/${files.length}）...`, 'info');
+    let ok = 0;
+    for (const file of files) {
+        const ext = file.name.split('.').pop();
+        const name = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': file.type },
+            body: file
+        });
+        if (res.ok) { ok++; showMsg('arc-msg', `上傳中（${ok}/${files.length}）...`, 'info'); }
+        else { showMsg('arc-msg', '上傳失敗，請確認 Storage Bucket 已建立', 'error'); return; }
+    }
+    showMsg('arc-msg', `${ok} 張照片上傳成功，典藏實錄頁面已更新`, 'success');
+    setTimeout(() => document.getElementById('arc-msg').innerHTML = '', 5000);
+    document.getElementById('arcInput').value = '';
+    loadArchives();
+}
+
+async function delArchive(name) {
+    if (!confirm(`確定從典藏刪除 ${name}？\n（網站典藏實錄頁面將同步移除）`)) return;
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, { method: 'DELETE', headers: h });
+    loadArchives();
 }
 
 function showMsg(id, text, type) {
