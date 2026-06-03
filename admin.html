@@ -45,6 +45,22 @@
         .msg-info { border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
         .placeholder { color: rgba(255,255,255,0.25); text-align: center; padding: 60px; font-size: 0.8rem; letter-spacing: 0.2rem; }
 
+        /* Collections editor */
+        .col-card { border: 1px solid rgba(255,255,255,0.1); padding: 30px; margin-bottom: 25px; }
+        .col-card h3 { font-size: 0.8rem; letter-spacing: 0.3rem; margin-bottom: 25px; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.62rem; letter-spacing: 0.25rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 8px; }
+        .form-group input, .form-group textarea {
+            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+            color: #fff; padding: 12px 15px; font-size: 0.88rem; outline: none; font-family: 'Inter', sans-serif;
+            transition: 0.3s; resize: vertical;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: rgba(255,255,255,0.4); }
+        .form-group textarea { min-height: 120px; line-height: 1.7; }
+        .save-btn { background: #fff; color: #000; border: none; padding: 12px 35px; font-size: 0.75rem; letter-spacing: 0.3rem; cursor: pointer; text-transform: uppercase; font-weight: 700; transition: 0.3s; }
+        .save-btn:hover { background: #ddd; }
+        .form-hint { font-size: 0.65rem; color: rgba(255,255,255,0.25); margin-top: 6px; letter-spacing: 0.1rem; }
+
         @media (max-width: 768px) { #panel { padding: 20px; } }
     </style>
 </head>
@@ -65,6 +81,7 @@
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('archives',this)">典藏照片</button>
+        <button class="tab-btn" onclick="switchTab('collections',this)">工藝選集</button>
         <button class="tab-btn" onclick="switchTab('images',this)">圖片庫</button>
     </div>
 
@@ -82,6 +99,12 @@
         <div class="img-grid" id="arc-grid">
             <div class="placeholder" style="grid-column:1/-1">載入中...</div>
         </div>
+    </div>
+
+    <!-- 工藝選集 -->
+    <div id="tab-collections" class="tab-content">
+        <div id="col-msg"></div>
+        <div id="col-editor"><div class="placeholder">載入中...</div></div>
     </div>
 
     <!-- 圖片庫 -->
@@ -132,6 +155,7 @@ function switchTab(name, btn) {
     document.getElementById('tab-' + name).classList.add('active');
     btn.classList.add('active');
     if (name === 'archives') loadArchives();
+    if (name === 'collections') loadCollections();
     if (name === 'images') loadImages();
 }
 
@@ -247,6 +271,72 @@ async function delImg(name) {
 }
 
 function copyUrl(url) { navigator.clipboard.writeText(url).then(() => alert('網址已複製！')); }
+
+// --- 工藝選集 ---
+async function loadCollections() {
+    const editor = document.getElementById('col-editor');
+    editor.innerHTML = '<div class="placeholder">載入中...</div>';
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/collections?order=id.asc`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        if (!res.ok || !data.length) throw new Error(data.message || '載入失敗');
+
+        editor.innerHTML = data.map(c => `
+            <div class="col-card">
+                <h3>Collection ${c.id} &nbsp;—&nbsp; ${c.name_zh}</h3>
+                <div class="form-group">
+                    <label>標籤（小字）</label>
+                    <input type="text" id="tag_${c.id}" value="${c.tag}">
+                </div>
+                <div class="form-group">
+                    <label>中文名稱</label>
+                    <input type="text" id="name_zh_${c.id}" value="${c.name_zh}">
+                </div>
+                <div class="form-group">
+                    <label>英文名稱</label>
+                    <input type="text" id="name_en_${c.id}" value="${c.name_en}">
+                </div>
+                <div class="form-group">
+                    <label>服務說明</label>
+                    <textarea id="desc_${c.id}">${c.description}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>服務項目（每行一項）</label>
+                    <textarea id="includes_${c.id}" style="min-height:180px;">${(c.includes||[]).join('\n')}</textarea>
+                    <p class="form-hint">每一行會變成一個項目，第一行和最後一行會自動加粗標示</p>
+                </div>
+                <button class="save-btn" onclick="saveCollection(${c.id})">儲存第 ${c.id} 項</button>
+            </div>`).join('');
+    } catch(e) {
+        editor.innerHTML = `<div class="placeholder" style="color:#ff6666;">載入失敗：${e.message}<br>請確認已在 Supabase 建立 collections 資料表</div>`;
+    }
+}
+
+async function saveCollection(id) {
+    showMsg('col-msg', '儲存中...', 'info');
+    const tag = document.getElementById(`tag_${id}`).value.trim();
+    const name_zh = document.getElementById(`name_zh_${id}`).value.trim();
+    const name_en = document.getElementById(`name_en_${id}`).value.trim();
+    const description = document.getElementById(`desc_${id}`).value.trim();
+    const includesRaw = document.getElementById(`includes_${id}`).value;
+    const includes = includesRaw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { ...sh, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ tag, name_zh, name_en, description, includes })
+    });
+
+    if (res.ok) {
+        showMsg('col-msg', `Collection ${id} 已儲存，網站即時更新`, 'success');
+        setTimeout(() => document.getElementById('col-msg').innerHTML = '', 4000);
+    } else {
+        const e = await res.json().catch(() => ({}));
+        showMsg('col-msg', '儲存失敗：' + (e.message || res.status), 'error');
+    }
+}
 </script>
 </body>
 </html>

@@ -9,7 +9,7 @@
     <style>
         .collections-hero { min-height: 45vh; padding-top: 160px; padding-bottom: 60px; }
         .collections-hero h1 { font-family: var(--font-serif); font-size: 5vw; font-weight: 400; line-height: 1.1; margin-bottom: 20px; }
-        .collections-subtitle { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.25rem; max-width: 500px; line-height: 1.7; }
+        .collections-subtitle { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.25rem; max-width: 500px; line-height: 1.7; margin-top: 20px; }
 
         .services-wrapper { padding: 0 var(--p-side) 120px; }
 
@@ -32,116 +32,31 @@
             letter-spacing: -0.02em;
             user-select: none;
         }
+        .service-tag { display: block; font-size: 0.62rem; letter-spacing: 0.45rem; color: var(--muted); text-transform: uppercase; margin-bottom: 18px; }
+        .service-name { font-family: var(--font-serif); font-size: 2.8rem; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+        .service-name-en { font-size: 0.75rem; letter-spacing: 0.35rem; color: var(--muted); text-transform: uppercase; margin-bottom: 35px; display: block; }
+        .service-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.85; max-width: 580px; margin-bottom: 40px; }
 
-        .service-tag {
-            display: block;
-            font-size: 0.62rem;
-            letter-spacing: 0.45rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-bottom: 18px;
-        }
-        .service-name {
-            font-family: var(--font-serif);
-            font-size: 2.8rem;
-            font-weight: 400;
-            line-height: 1.1;
-            margin-bottom: 8px;
-        }
-        .service-name-en {
-            font-size: 0.75rem;
-            letter-spacing: 0.35rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-bottom: 35px;
-            display: block;
-        }
-        .service-desc {
-            font-size: 0.95rem;
-            color: var(--muted);
-            line-height: 1.85;
-            max-width: 580px;
-            margin-bottom: 40px;
-        }
-
-        .service-includes {
-            list-style: none;
-            margin-bottom: 45px;
-            max-width: 520px;
-        }
-        .service-includes li {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            font-size: 0.88rem;
-            color: rgba(255,255,255,0.75);
-            letter-spacing: 0.05rem;
-        }
-        .service-includes li::before {
-            content: '';
-            width: 18px;
-            height: 1px;
-            background: rgba(255,255,255,0.25);
-            flex-shrink: 0;
-        }
-        .service-includes li.highlight {
-            color: rgba(255,255,255,0.95);
-            font-weight: 400;
-        }
+        .service-includes { list-style: none; margin-bottom: 45px; max-width: 520px; }
+        .service-includes li { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.88rem; color: rgba(255,255,255,0.75); }
+        .service-includes li::before { content: ''; width: 18px; height: 1px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+        .service-includes li.highlight { color: rgba(255,255,255,0.95); }
         .service-includes li.highlight::before { background: rgba(255,255,255,0.6); }
 
-        .service-footer {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-        .service-price-label {
-            font-size: 0.62rem;
-            letter-spacing: 0.3rem;
-            color: var(--muted);
-            text-transform: uppercase;
-        }
-        .service-price-val {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 4px;
-        }
-        .service-btn {
-            display: inline-block;
-            padding: 16px 40px;
-            border: 1px solid rgba(255,255,255,0.35);
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.7rem;
-            letter-spacing: 0.35rem;
-            text-transform: uppercase;
-            transition: 0.4s var(--ease-silk);
-        }
+        .service-footer { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+        .service-price-label { font-size: 0.62rem; letter-spacing: 0.3rem; color: var(--muted); text-transform: uppercase; }
+        .service-price-val { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+        .service-btn { display: inline-block; padding: 16px 40px; border: 1px solid rgba(255,255,255,0.35); color: #fff; text-decoration: none; font-size: 0.7rem; letter-spacing: 0.35rem; text-transform: uppercase; transition: 0.4s var(--ease-silk); }
         .service-btn:hover { background: #fff; color: #000; border-color: #fff; }
 
-        /* Guarantee strip */
-        .guarantee-strip {
-            background: rgba(255,255,255,0.03);
-            border-top: 1px solid rgba(255,255,255,0.07);
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            padding: 50px var(--p-side);
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 0;
-        }
+        .guarantee-strip { background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); padding: 50px var(--p-side); display: flex; justify-content: space-around; flex-wrap: wrap; gap: 30px; }
         .guarantee-item { text-align: center; }
         .guarantee-num { font-family: var(--font-serif); font-size: 2.5rem; font-weight: 400; margin-bottom: 8px; }
         .guarantee-label { font-size: 0.65rem; letter-spacing: 0.25rem; color: var(--muted); text-transform: uppercase; }
 
-        @media (max-width: 1024px) {
-            .service-item { grid-template-columns: 120px 1fr; gap: 50px; }
-            .service-num { font-size: 5rem; }
-        }
+        .loading-msg { text-align: center; padding: 100px var(--p-side); color: rgba(255,255,255,0.2); font-size: 0.8rem; letter-spacing: 0.3rem; }
+
+        @media (max-width: 1024px) { .service-item { grid-template-columns: 120px 1fr; gap: 50px; } .service-num { font-size: 5rem; } }
         @media (max-width: 768px) {
             .collections-hero { min-height: auto; }
             .collections-hero h1 { font-size: 2.5rem; }
@@ -152,7 +67,6 @@
             .service-footer { flex-direction: column; gap: 20px; }
             .service-btn { width: 100%; text-align: center; }
             .guarantee-strip { padding: 40px var(--p-side); }
-            .guarantee-num { font-size: 2rem; }
         }
     </style>
 </head>
@@ -164,18 +78,10 @@
             <span></span><span></span><span></span>
         </button>
         <div class="nav-links">
-            <a href="index.html" class="bilingual-link">
-                <span class="bilingual-inner"><span class="en">Home</span><span class="zh">品牌首頁</span></span>
-            </a>
-            <a href="glow.html" class="bilingual-link">
-                <span class="bilingual-inner"><span class="en">Collections</span><span class="zh">工藝選集</span></span>
-            </a>
-            <a href="drop.html" class="bilingual-link">
-                <span class="bilingual-inner"><span class="en">Archives</span><span class="zh">典藏實錄</span></span>
-            </a>
-            <a href="booking.html" class="bilingual-link">
-                <span class="bilingual-inner"><span class="en">Booking</span><span class="zh">立即預約</span></span>
-            </a>
+            <a href="index.html" class="bilingual-link"><span class="bilingual-inner"><span class="en">Home</span><span class="zh">品牌首頁</span></span></a>
+            <a href="glow.html" class="bilingual-link"><span class="bilingual-inner"><span class="en">Collections</span><span class="zh">工藝選集</span></span></a>
+            <a href="drop.html" class="bilingual-link"><span class="bilingual-inner"><span class="en">Archives</span><span class="zh">典藏實錄</span></span></a>
+            <a href="booking.html" class="bilingual-link"><span class="bilingual-inner"><span class="en">Booking</span><span class="zh">立即預約</span></span></a>
         </div>
     </nav>
 
@@ -183,119 +89,70 @@
         <section class="collections-hero reveal-maison">
             <span style="font-size:0.65rem;letter-spacing:0.5rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:25px;">工藝選集 / THE COLLECTIONS</span>
             <h1>為愛車選擇<br>最合適的守護</h1>
-            <p class="collections-subtitle" style="margin-top:20px;">三種等級的專業工藝方案，從日常養護到頂級防護，每一項都是龍策對品質的完整承諾。</p>
+            <p class="collections-subtitle">三種等級的專業工藝方案，從日常養護到頂級防護，每一項都是龍策對品質的完整承諾。</p>
         </section>
 
-        <div class="services-wrapper">
-
-            <!-- Collection 01 -->
-            <div class="service-item reveal-maison">
-                <div class="service-num">01</div>
-                <div>
-                    <span class="service-tag">Collection 01 / Gloss</span>
-                    <h2 class="service-name">城市焦點精洗</h2>
-                    <span class="service-name-en">Urban Gloss Detail</span>
-                    <p class="service-desc">
-                        專為重視日常養護的車主設計。透過完整的外觀深層清潔與輕度漆面修復，在城市生活中持續維持愛車最佳的光澤狀態，是每季定期保養的首選方案。
-                    </p>
-                    <ul class="service-includes">
-                        <li>全車外觀精洗 + 輪圈輪胎深度清潔</li>
-                        <li>黏土棒去除漆面污染物（鐵粉、柏油）</li>
-                        <li>輕微旋渦紋路研磨修復</li>
-                        <li>手工高品質封蠟保護</li>
-                        <li>玻璃潑水鍍膜處理</li>
-                        <li>車內除塵、儀表板護理</li>
-                    </ul>
-                    <div class="service-footer">
-                        <div>
-                            <div class="service-price-label">參考報價</div>
-                            <div class="service-price-val">歡迎洽詢</div>
-                        </div>
-                        <a href="https://www.ezpretty.com.tw/ezpretty/ezpretty/login?es=5545d31e706480f49bb20ba65548e6ca&redirect=/ezpretty/aio%23/5545d31e706480f49bb20ba65548e6ca" target="_blank" rel="noopener" class="service-btn">預約此項服務</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Collection 02 -->
-            <div class="service-item reveal-maison">
-                <div class="service-num">02</div>
-                <div>
-                    <span class="service-tag">Collection 02 / Shield</span>
-                    <h2 class="service-name">結晶美學鍍膜</h2>
-                    <span class="service-name-en">Ceramic Coating</span>
-                    <p class="service-desc">
-                        以日本進口陶瓷鍍膜技術，在漆面建立奈米級硬度防護層。色澤更飽和、光感更深邃，同時長效抵禦日曬、酸雨、細砂與化學污染物的侵蝕。
-                    </p>
-                    <ul class="service-includes">
-                        <li class="highlight">包含 Collection 01 全部項目</li>
-                        <li>漆面深度研磨校正（去除細紋、旋渦紋）</li>
-                        <li>日本進口 9H 陶瓷鍍膜施作</li>
-                        <li>鍍膜表面硬度強化處理</li>
-                        <li>輪圈鍍膜保護</li>
-                        <li class="highlight">鍍膜保固：12 個月</li>
-                    </ul>
-                    <div class="service-footer">
-                        <div>
-                            <div class="service-price-label">參考報價</div>
-                            <div class="service-price-val">歡迎洽詢</div>
-                        </div>
-                        <a href="https://www.ezpretty.com.tw/ezpretty/ezpretty/login?es=5545d31e706480f49bb20ba65548e6ca&redirect=/ezpretty/aio%23/5545d31e706480f49bb20ba65548e6ca" target="_blank" rel="noopener" class="service-btn">預約此項服務</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Collection 03 -->
-            <div class="service-item reveal-maison">
-                <div class="service-num">03</div>
-                <div>
-                    <span class="service-tag">Collection 03 / Armor</span>
-                    <h2 class="service-name">旗艦漆面防護</h2>
-                    <span class="service-name-en">Flagship Paint Protection</span>
-                    <p class="service-desc">
-                        龍策最高規格的全方位防護系統。結合 TPU 漆面保護膜（PPF）與頂級鍍膜雙重工法，為超跑、豪華座駕提供業界最完整的長期物理與化學防護。
-                    </p>
-                    <ul class="service-includes">
-                        <li class="highlight">包含 Collection 01 + 02 全部項目</li>
-                        <li>全車 TPU 漆面保護膜（PPF）貼附</li>
-                        <li>門邊、引擎蓋重點加強防護</li>
-                        <li>頂級旗艦陶瓷鍍膜封層</li>
-                        <li>施工後全車精密品質檢測</li>
-                        <li class="highlight">鍍膜保固：36 個月</li>
-                    </ul>
-                    <div class="service-footer">
-                        <div>
-                            <div class="service-price-label">參考報價</div>
-                            <div class="service-price-val">歡迎洽詢</div>
-                        </div>
-                        <a href="https://www.ezpretty.com.tw/ezpretty/ezpretty/login?es=5545d31e706480f49bb20ba65548e6ca&redirect=/ezpretty/aio%23/5545d31e706480f49bb20ba65548e6ca" target="_blank" rel="noopener" class="service-btn">預約此項服務</a>
-                    </div>
-                </div>
-            </div>
-
+        <div id="services-wrapper" class="services-wrapper">
+            <div class="loading-msg">載入中...</div>
         </div>
 
-        <!-- 數字保證 -->
         <div class="guarantee-strip reveal-maison">
-            <div class="guarantee-item">
-                <div class="guarantee-num">12+</div>
-                <div class="guarantee-label">品牌深耕年數</div>
-            </div>
-            <div class="guarantee-item">
-                <div class="guarantee-num">500+</div>
-                <div class="guarantee-label">服務完工案例</div>
-            </div>
-            <div class="guarantee-item">
-                <div class="guarantee-num">9H</div>
-                <div class="guarantee-label">頂級鍍膜硬度</div>
-            </div>
-            <div class="guarantee-item">
-                <div class="guarantee-num">36M</div>
-                <div class="guarantee-label">最長保固月數</div>
-            </div>
+            <div class="guarantee-item"><div class="guarantee-num">12+</div><div class="guarantee-label">品牌深耕年數</div></div>
+            <div class="guarantee-item"><div class="guarantee-num">500+</div><div class="guarantee-label">服務完工案例</div></div>
+            <div class="guarantee-item"><div class="guarantee-num">9H</div><div class="guarantee-label">頂級鍍膜硬度</div></div>
+            <div class="guarantee-item"><div class="guarantee-num">36M</div><div class="guarantee-label">最長保固月數</div></div>
         </div>
-
     </main>
 
+    <script>
+    const SUPABASE_URL = 'https://dgepltmxtbwbfalqgnqv.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZXBsdG14dGJ3YmZhbHFnbnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDU2NzIsImV4cCI6MjA5NjA4MTY3Mn0.pqGMLBJGBc4apgLIZCnIVGiVaq4XN6Zqws15wC1sZQ4';
+    const BOOKING_URL = 'https://www.ezpretty.com.tw/ezpretty/ezpretty/login?es=5545d31e706480f49bb20ba65548e6ca&redirect=/ezpretty/aio%23/5545d31e706480f49bb20ba65548e6ca';
+
+    async function loadCollections() {
+        const wrapper = document.getElementById('services-wrapper');
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/collections?order=id.asc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await res.json();
+            if (!res.ok || !data.length) throw new Error();
+
+            wrapper.innerHTML = data.map((c, i) => `
+                <div class="service-item reveal-maison">
+                    <div class="service-num">${String(i+1).padStart(2,'0')}</div>
+                    <div>
+                        <span class="service-tag">${c.tag}</span>
+                        <h2 class="service-name">${c.name_zh}</h2>
+                        <span class="service-name-en">${c.name_en}</span>
+                        <p class="service-desc">${c.description}</p>
+                        <ul class="service-includes">
+                            ${(c.includes || []).map((item, idx) =>
+                                `<li class="${idx === 0 && i > 0 ? 'highlight' : idx === (c.includes.length-1) && c.includes[idx].includes('保固') ? 'highlight' : ''}">${item}</li>`
+                            ).join('')}
+                        </ul>
+                        <div class="service-footer">
+                            <div>
+                                <div class="service-price-label">參考報價</div>
+                                <div class="service-price-val">歡迎洽詢</div>
+                            </div>
+                            <a href="${BOOKING_URL}" target="_blank" rel="noopener" class="service-btn">預約此項服務</a>
+                        </div>
+                    </div>
+                </div>`).join('');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+            }, { threshold: 0.1 });
+            wrapper.querySelectorAll('.reveal-maison').forEach(el => observer.observe(el));
+
+        } catch(e) {
+            wrapper.innerHTML = '<div class="loading-msg">內容載入失敗，請稍後再試</div>';
+        }
+    }
+
+    loadCollections();
+    </script>
     <script src="assets/js/main.js"></script>
 </body>
 </html>
