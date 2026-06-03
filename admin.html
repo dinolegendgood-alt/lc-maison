@@ -296,7 +296,11 @@ async function uploadImages(files) {
 
 async function delImg(name) {
     if (!confirm('確定刪除？')) return;
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, { method: 'DELETE', headers: sh });
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>{}); alert('刪除失敗：' + (e?.message || res.status)); return; }
     loadImages();
 }
 
@@ -348,7 +352,11 @@ async function uploadArchives(files) {
 
 async function delArchive(name) {
     if (!confirm('確定從典藏刪除此照片？')) return;
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, { method: 'DELETE', headers: sh });
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>{}); alert('刪除失敗：' + (e?.message || res.status)); return; }
     loadArchives();
 }
 
