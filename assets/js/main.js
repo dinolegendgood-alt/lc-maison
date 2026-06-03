@@ -1,42 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Menu Logic
-    const menuTrigger = document.getElementById('menuTrigger');
-    const overlayMenu = document.getElementById('overlayMenu');
-    const menuLinks = document.querySelectorAll('.menu-links a');
 
-    if (menuTrigger && overlayMenu) {
+    // Hamburger Menu
+    const menuTrigger = document.getElementById('menuTrigger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (menuTrigger && navLinks) {
         menuTrigger.addEventListener('click', () => {
-            overlayMenu.classList.toggle('active');
-            menuTrigger.classList.toggle('active');
+            navLinks.classList.toggle('open');
+            menuTrigger.classList.toggle('open');
+            document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
         });
 
-        menuLinks.forEach(link => {
+        navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
-                overlayMenu.classList.remove('active');
-                menuTrigger.classList.remove('active');
+                navLinks.classList.remove('open');
+                menuTrigger.classList.remove('open');
+                document.body.style.overflow = '';
             });
         });
     }
 
-    // Scroll Reveals
-    const observerOptions = {
-        threshold: 0.1
-    };
-
+    // Scroll Reveal for .reveal-maison
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-            }
+            if (entry.isIntersecting) entry.target.classList.add('is-visible');
         });
-    }, observerOptions);
+    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal-maison').forEach(el => observer.observe(el));
 
-    // Page Transition effect (simple fade)
+    // Page fade-in
     document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 1s cubic-bezier(0.23, 1, 0.32, 1)';
-    window.setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 100);
+    document.body.style.transition = 'opacity 0.8s ease';
+    setTimeout(() => { document.body.style.opacity = '1'; }, 50);
 });
