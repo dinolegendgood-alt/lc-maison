@@ -246,52 +246,33 @@ async function delAppt(id) {
     loadAppointments();
 }
 
-// --- Images (Cloudflare R2) ---
-async function r2List(prefix = '') {
-    const res = await fetch(`/api/r2?action=list&prefix=${encodeURIComponent(prefix)}`);
-    if (!res.ok) throw new Error((await res.json()).error || '載入失敗');
-    return await res.json();
-}
+const BUCKET = 'images';
+const ARC_PREFIX = 'archives/';
+const sh = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-async function r2Upload(key, file) {
-    const res = await fetch(`/api/r2?action=upload&key=${encodeURIComponent(key)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type, 'X-Admin-Key': ADMIN_PW },
-        body: file
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || '上傳失敗');
-    return data;
-}
-
-async function r2Delete(key) {
-    await fetch(`/api/r2?action=delete&key=${encodeURIComponent(key)}`, {
-        method: 'DELETE',
-        headers: { 'X-Admin-Key': ADMIN_PW }
-    });
-}
-
+// --- Images (Supabase Storage) ---
 async function loadImages() {
     const grid = document.getElementById('img-grid');
     grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">載入中...</div>';
     try {
-        const files = (await r2List('')).filter(f => !f.key.startsWith('archives/'));
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+            method: 'POST', headers: sh,
+            body: JSON.stringify({ limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } })
+        });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">載入失敗</div>'; return; }
+        const files = data.filter(f => f.name && !f.name.startsWith('archives/') && f.name !== '.emptyFolderPlaceholder');
         if (!files.length) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">尚無圖片，請上傳</div>'; return; }
         grid.innerHTML = files.map(f => {
-            const url = f.url || f.key;
-            const name = f.key.split('/').pop();
-            return `<div class="img-card">
-                <img src="${url}" loading="lazy">
+            const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${f.name}`;
+            return `<div class="img-card"><img src="${url}" loading="lazy">
                 <div class="img-overlay">
-                    <p class="img-name">${name}</p>
+                    <p class="img-name">${f.name}</p>
                     <button class="copy-btn" onclick="copyUrl('${url}')">複製網址</button>
-                    <button class="del-img-btn" onclick="delImg('${f.key}')">刪除</button>
-                </div>
-            </div>`;
+                    <button class="del-img-btn" onclick="delImg('${f.name}')">刪除</button>
+                </div></div>`;
         }).join('');
-    } catch(e) {
-        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`;
-    }
+    } catch(e) { grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`; }
 }
 
 async function uploadImages(files) {
@@ -299,12 +280,14 @@ async function uploadImages(files) {
     let ok = 0;
     for (const file of files) {
         const ext = file.name.split('.').pop();
-        const key = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
-        try {
-            await r2Upload(key, file);
-            ok++;
-            showMsg('img-msg', `上傳中（${ok}/${files.length}）...`, 'info');
-        } catch(e) { showMsg('img-msg', '上傳失敗：' + e.message, 'error'); return; }
+        const name = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': file.type },
+            body: file
+        });
+        if (res.ok) { ok++; showMsg('img-msg', `上傳中（${ok}/${files.length}）...`, 'info'); }
+        else { showMsg('img-msg', '上傳失敗', 'error'); return; }
     }
     showMsg('img-msg', `${ok} 張圖片上傳成功`, 'success');
     setTimeout(() => document.getElementById('img-msg').innerHTML = '', 4000);
@@ -312,37 +295,36 @@ async function uploadImages(files) {
     loadImages();
 }
 
-async function delImg(key) {
-    if (!confirm(`確定刪除？`)) return;
-    await r2Delete(key);
+async function delImg(name) {
+    if (!confirm('確定刪除？')) return;
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, { method: 'DELETE', headers: sh });
     loadImages();
 }
 
-function copyUrl(url) {
-    navigator.clipboard.writeText(url).then(() => alert('圖片網址已複製！'));
-}
+function copyUrl(url) { navigator.clipboard.writeText(url).then(() => alert('網址已複製！')); }
 
-// --- Archives (Cloudflare R2) ---
+// --- Archives (Supabase Storage) ---
 async function loadArchives() {
     const grid = document.getElementById('arc-grid');
     grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">載入中...</div>';
     try {
-        const files = await r2List('archives/');
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
+            method: 'POST', headers: sh,
+            body: JSON.stringify({ limit: 200, offset: 0, prefix: ARC_PREFIX, sortBy: { column: 'created_at', order: 'desc' } })
+        });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">載入失敗</div>'; return; }
+        const files = data.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
         if (!files.length) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">尚無典藏照片，請上傳</div>'; return; }
         grid.innerHTML = files.map(f => {
-            const url = f.url || f.key;
-            const name = f.key.split('/').pop();
-            return `<div class="img-card">
-                <img src="${url}" loading="lazy">
+            const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${ARC_PREFIX}${f.name}`;
+            return `<div class="img-card"><img src="${url}" loading="lazy">
                 <div class="img-overlay">
-                    <p class="img-name">${name}</p>
-                    <button class="del-img-btn" onclick="delArchive('${f.key}')">從典藏刪除</button>
-                </div>
-            </div>`;
+                    <p class="img-name">${f.name}</p>
+                    <button class="del-img-btn" onclick="delArchive('${f.name}')">從典藏刪除</button>
+                </div></div>`;
         }).join('');
-    } catch(e) {
-        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`;
-    }
+    } catch(e) { grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`; }
 }
 
 async function uploadArchives(files) {
@@ -350,12 +332,14 @@ async function uploadArchives(files) {
     let ok = 0;
     for (const file of files) {
         const ext = file.name.split('.').pop();
-        const key = `archives/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
-        try {
-            await r2Upload(key, file);
-            ok++;
-            showMsg('arc-msg', `上傳中（${ok}/${files.length}）...`, 'info');
-        } catch(e) { showMsg('arc-msg', '上傳失敗：' + e.message, 'error'); return; }
+        const name = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': file.type },
+            body: file
+        });
+        if (res.ok) { ok++; showMsg('arc-msg', `上傳中（${ok}/${files.length}）...`, 'info'); }
+        else { showMsg('arc-msg', '上傳失敗', 'error'); return; }
     }
     showMsg('arc-msg', `${ok} 張照片上傳成功，典藏實錄已更新`, 'success');
     setTimeout(() => document.getElementById('arc-msg').innerHTML = '', 5000);
@@ -363,9 +347,9 @@ async function uploadArchives(files) {
     loadArchives();
 }
 
-async function delArchive(key) {
-    if (!confirm(`確定從典藏刪除此照片？`)) return;
-    await r2Delete(key);
+async function delArchive(name) {
+    if (!confirm('確定從典藏刪除此照片？')) return;
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, { method: 'DELETE', headers: sh });
     loadArchives();
 }
 
