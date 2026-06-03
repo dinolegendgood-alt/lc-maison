@@ -246,54 +246,65 @@ async function delAppt(id) {
     loadAppointments();
 }
 
-// --- Images ---
+// --- Images (Cloudflare R2) ---
+async function r2List(prefix = '') {
+    const res = await fetch(`/api/r2?action=list&prefix=${encodeURIComponent(prefix)}`);
+    if (!res.ok) throw new Error((await res.json()).error || '載入失敗');
+    return await res.json();
+}
+
+async function r2Upload(key, file) {
+    const res = await fetch(`/api/r2?action=upload&key=${encodeURIComponent(key)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type, 'X-Admin-Key': ADMIN_PW },
+        body: file
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '上傳失敗');
+    return data;
+}
+
+async function r2Delete(key) {
+    await fetch(`/api/r2?action=delete&key=${encodeURIComponent(key)}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Key': ADMIN_PW }
+    });
+}
+
 async function loadImages() {
     const grid = document.getElementById('img-grid');
     grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">載入中...</div>';
     try {
-        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
-            method: 'POST', headers: h, body: JSON.stringify({limit:200, offset:0, sortBy:{column:'created_at', order:'desc'}})
-        });
-        const data = await res.json();
-        if (!res.ok || !Array.isArray(data)) {
-            grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">請先在 Supabase Storage 建立名為「images」的公開 Bucket</div>';
-            return;
-        }
-        const files = data.filter(f => f.name !== '.emptyFolderPlaceholder');
+        const files = (await r2List('')).filter(f => !f.key.startsWith('archives/'));
         if (!files.length) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">尚無圖片，請上傳</div>'; return; }
-
         grid.innerHTML = files.map(f => {
-            const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${f.name}`;
-            return `
-                <div class="img-card">
-                    <img src="${url}" loading="lazy">
-                    <div class="img-overlay">
-                        <p class="img-name">${f.name}</p>
-                        <button class="copy-btn" onclick="copyUrl('${url}')">複製網址</button>
-                        <button class="del-img-btn" onclick="delImg('${f.name}')">刪除</button>
-                    </div>
-                </div>`;
+            const url = f.url || f.key;
+            const name = f.key.split('/').pop();
+            return `<div class="img-card">
+                <img src="${url}" loading="lazy">
+                <div class="img-overlay">
+                    <p class="img-name">${name}</p>
+                    <button class="copy-btn" onclick="copyUrl('${url}')">複製網址</button>
+                    <button class="del-img-btn" onclick="delImg('${f.key}')">刪除</button>
+                </div>
+            </div>`;
         }).join('');
     } catch(e) {
-        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">錯誤：${e.message}</div>`;
+        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`;
     }
 }
 
 async function uploadImages(files) {
-    const msgEl = document.getElementById('img-msg');
     showMsg('img-msg', `上傳中（0/${files.length}）...`, 'info');
     let ok = 0;
     for (const file of files) {
         const ext = file.name.split('.').pop();
-        const name = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
-        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': file.type },
-            body: file
-        });
-        if (res.ok) ok++;
-        else { showMsg('img-msg', '上傳失敗，請確認已建立名為「images」的公開 Storage Bucket', 'error'); return; }
-        showMsg('img-msg', `上傳中（${ok}/${files.length}）...`, 'info');
+        const key = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        try {
+            await r2Upload(key, file);
+            ok++;
+            showMsg('img-msg', `上傳中（${ok}/${files.length}）...`, 'info');
+        } catch(e) { showMsg('img-msg', '上傳失敗：' + e.message, 'error'); return; }
     }
     showMsg('img-msg', `${ok} 張圖片上傳成功`, 'success');
     setTimeout(() => document.getElementById('img-msg').innerHTML = '', 4000);
@@ -301,9 +312,9 @@ async function uploadImages(files) {
     loadImages();
 }
 
-async function delImg(name) {
-    if (!confirm(`確定刪除 ${name}？`)) return;
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${name}`, { method: 'DELETE', headers: h });
+async function delImg(key) {
+    if (!confirm(`確定刪除？`)) return;
+    await r2Delete(key);
     loadImages();
 }
 
@@ -311,38 +322,26 @@ function copyUrl(url) {
     navigator.clipboard.writeText(url).then(() => alert('圖片網址已複製！'));
 }
 
-// --- Archives ---
-const ARC_PREFIX = 'archives/';
-
+// --- Archives (Cloudflare R2) ---
 async function loadArchives() {
     const grid = document.getElementById('arc-grid');
     grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">載入中...</div>';
     try {
-        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`, {
-            method: 'POST', headers: h,
-            body: JSON.stringify({ limit: 200, offset: 0, prefix: ARC_PREFIX, sortBy: { column: 'created_at', order: 'desc' } })
-        });
-        const data = await res.json();
-        if (!res.ok || !Array.isArray(data)) {
-            grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">請確認 Storage Bucket「images」已建立</div>';
-            return;
-        }
-        const files = data.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+        const files = await r2List('archives/');
         if (!files.length) { grid.innerHTML = '<div class="placeholder" style="grid-column:1/-1">尚無典藏照片，請上傳</div>'; return; }
-
         grid.innerHTML = files.map(f => {
-            const url = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${ARC_PREFIX}${f.name}`;
-            return `
-                <div class="img-card">
-                    <img src="${url}" loading="lazy">
-                    <div class="img-overlay">
-                        <p class="img-name">${f.name}</p>
-                        <button class="del-img-btn" onclick="delArchive('${f.name}')">從典藏刪除</button>
-                    </div>
-                </div>`;
+            const url = f.url || f.key;
+            const name = f.key.split('/').pop();
+            return `<div class="img-card">
+                <img src="${url}" loading="lazy">
+                <div class="img-overlay">
+                    <p class="img-name">${name}</p>
+                    <button class="del-img-btn" onclick="delArchive('${f.key}')">從典藏刪除</button>
+                </div>
+            </div>`;
         }).join('');
     } catch(e) {
-        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">錯誤：${e.message}</div>`;
+        grid.innerHTML = `<div class="placeholder" style="grid-column:1/-1;color:#ff6666;">${e.message}</div>`;
     }
 }
 
@@ -351,24 +350,22 @@ async function uploadArchives(files) {
     let ok = 0;
     for (const file of files) {
         const ext = file.name.split('.').pop();
-        const name = `${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
-        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': file.type },
-            body: file
-        });
-        if (res.ok) { ok++; showMsg('arc-msg', `上傳中（${ok}/${files.length}）...`, 'info'); }
-        else { showMsg('arc-msg', '上傳失敗，請確認 Storage Bucket 已建立', 'error'); return; }
+        const key = `archives/${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+        try {
+            await r2Upload(key, file);
+            ok++;
+            showMsg('arc-msg', `上傳中（${ok}/${files.length}）...`, 'info');
+        } catch(e) { showMsg('arc-msg', '上傳失敗：' + e.message, 'error'); return; }
     }
-    showMsg('arc-msg', `${ok} 張照片上傳成功，典藏實錄頁面已更新`, 'success');
+    showMsg('arc-msg', `${ok} 張照片上傳成功，典藏實錄已更新`, 'success');
     setTimeout(() => document.getElementById('arc-msg').innerHTML = '', 5000);
     document.getElementById('arcInput').value = '';
     loadArchives();
 }
 
-async function delArchive(name) {
-    if (!confirm(`確定從典藏刪除 ${name}？\n（網站典藏實錄頁面將同步移除）`)) return;
-    await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${ARC_PREFIX}${name}`, { method: 'DELETE', headers: h });
+async function delArchive(key) {
+    if (!confirm(`確定從典藏刪除此照片？`)) return;
+    await r2Delete(key);
     loadArchives();
 }
 
